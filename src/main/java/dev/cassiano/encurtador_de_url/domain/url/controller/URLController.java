@@ -3,9 +3,12 @@ package dev.cassiano.encurtador_de_url.domain.url.controller;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.servlet.view.RedirectView;
 
 import dev.cassiano.encurtador_de_url.domain.error.NullRequestParam;
 import dev.cassiano.encurtador_de_url.domain.url.dtos.*;
@@ -18,20 +21,16 @@ public class URLController {
     
     @Autowired
     private URLService service;
-    /*
-    @Autowired 
-    private URLRepository repository;
-    */
-    /*
+
     @GetMapping("/{shortcode}")
     public RedirectView redirectByShortcode(@PathVariable String shortcode) {
-        URL url = repository.findByShortcode(shortcode).orElseThrow(() -> new RuntimeException());
         RedirectView redirectView = new RedirectView();
-        redirectView.setUrl(url.getUrl());
-
+        redirectView.setUrl(service.findUrlByShortcode(shortcode));
+        redirectView.setStatusCode(HttpStatusCode.valueOf(302));
+        
         return redirectView;
     }
-    */
+
     @PostMapping(value = "/shorten")
     public ResponseEntity<URLResponseDTO> shortenURL(@RequestBody URLResquestDTO request){
         if (request.url() == null) {

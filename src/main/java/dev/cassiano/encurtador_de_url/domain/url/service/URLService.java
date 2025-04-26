@@ -15,11 +15,16 @@ public class URLService {
     @Autowired
     private URLRepository repository;
 
+    public String findUrlByShortcode(String shortcode) {
+        URL url = repository.findByShortcode(shortcode).orElseThrow(() -> new RuntimeException());
+        return url.getUrl();
+    }
+
     public URL createNewUrl(String url) {      
         String shortcode;
         do{    
             char[] uuid = UUID.randomUUID().toString().replace("-", "").toCharArray();
-            shortcode = String.valueOf(uuid, 0, 10);  
+            shortcode = String.valueOf(uuid, 0, 15);  
             System.out.println(shortcode);
         } while (repository.findByShortcode(shortcode).isPresent());
 
