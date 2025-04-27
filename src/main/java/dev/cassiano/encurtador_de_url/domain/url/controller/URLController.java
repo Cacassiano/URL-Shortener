@@ -10,7 +10,6 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.view.RedirectView;
 
-import dev.cassiano.encurtador_de_url.domain.error.NullRequestParam;
 import dev.cassiano.encurtador_de_url.domain.url.dtos.*;
 import dev.cassiano.encurtador_de_url.domain.url.entity.URL;
 import dev.cassiano.encurtador_de_url.domain.url.service.URLService;
@@ -33,8 +32,8 @@ public class URLController {
 
     @PostMapping(value = "/shorten")
     public ResponseEntity<URLResponseDTO> shortenURL(@RequestBody URLResquestDTO request){
-        if (request.url() == null) {
-            throw new NullRequestParam("The required information 'url' is NULL");
+        if (request.url() == null || request.url().length() <= 1) {
+            throw new NullPointerException("Required information 'url' is missing");
         }
         URL newUrl = service.createNewUrl(request.url());
         return ResponseEntity

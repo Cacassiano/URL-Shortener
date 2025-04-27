@@ -6,6 +6,7 @@ import java.time.OffsetDateTime;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import dev.cassiano.encurtador_de_url.domain.error.exceptions.NotFoundException;
 import dev.cassiano.encurtador_de_url.domain.url.entity.URL;
 import dev.cassiano.encurtador_de_url.domain.url.repository.URLRepository;
 
@@ -16,7 +17,7 @@ public class URLService {
     private URLRepository repository;
 
     public String findUrlByShortcode(String shortcode) {
-        URL url = repository.findByShortcode(shortcode).orElseThrow(() -> new RuntimeException());
+        URL url = repository.findByShortcode(shortcode).orElseThrow(() -> new NotFoundException("This shortcode do not exists"));
         return url.getUrl();
     }
 
