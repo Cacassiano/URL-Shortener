@@ -18,6 +18,8 @@ public class URLService {
 
     public String findUrlByShortcode(String shortcode) {
         URL url = repository.findByShortcode(shortcode).orElseThrow(() -> new NotFoundException("This shortcode do not exists"));
+        url.setAcesscount(url.getAcesscount()+1);
+        repository.save(url);
         return url.getUrl();
     }
 
