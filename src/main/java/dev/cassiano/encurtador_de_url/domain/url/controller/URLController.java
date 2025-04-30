@@ -7,6 +7,7 @@ import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RestController;
@@ -27,6 +28,10 @@ public class URLController {
 
     @Autowired
     private TokenService tkService;
+    
+    private String getSubjectByHeader(String header) {
+        return tkService.getSubject(header.replace("Bearer ", ""));
+    }
 
     @GetMapping("/{shortcode}")
     public RedirectView redirectByShortcode(@PathVariable String shortcode) throws NotFoundException {
@@ -42,7 +47,7 @@ public class URLController {
         if (url.url() == null || url.url().length() <= 1) {
             throw new NullPointerException("Required information 'url' is missing");
         }
-        URL newUrl = service.createNewUrl(url.url(), tkService.getSubject(header.replace("Bearer ", "")));
+        URL newUrl = service.createNewUrl(url.url(), this.getSubjectByHeader(header));
         return ResponseEntity
                 .status(HttpStatusCode.valueOf(201))
                 .body(new URLResponseDTO(newUrl));
@@ -50,13 +55,28 @@ public class URLController {
 
     @DeleteMapping(value = "/api/v1/shorten/{shortcode}")
     public ResponseEntity<String> deleteShorten(@PathVariable String shortcode, @RequestHeader("Authorization") String header) throws NotFoundException {
-        service.deleteShortenUrl(shortcode, tkService.getSubject(header.replace("Bearer ", "")));
+        service.deleteShortenUrl(shortcode, this.getSubjectByHeader(header));
         return ResponseEntity.noContent().build();
     }
 
     @GetMapping(value = "/api/v1/shorten/{shortcode}")
     public ResponseEntity<URLResponseDTO> getOriginalUrl(@PathVariable String shortcode, @RequestHeader("Authorization") String header) throws NotFoundException {
         return ResponseEntity
-                .ok(service.returnOriginalUrl(shortcode, tkService.getSubject(header.replace("Bearer ", ""))));
+                .ok(service.returnOriginalUrl(shortcode, this.getSubjectByHeader(header)));
+    }
+
+    @GetMapping(value = "/api/v1/shorten/{shortcode}/stats")
+    public ResponseEntity<URLStatsResponseDTO> getStats(@PathVariable String shortcode, @RequestHeader("Authorization") String header) throws NotFoundException {
+        URLStatsResponseDTO dto = service.getAllStats(shortcode, this.getSubjectByHeader(header));
+        return ResponseEntity.ok(dto);
+    }
+
+    @PutMapping("/api/v1/shorten/{shortcode}")
+    public ResponseEntity<URLStatsResponseDTO> updateUrl(@RequestBody URLUpdateDTO url, @PathVariable String shortcode, @RequestHeader("Authorization") String header) throws NotFoundException {
+        String token = this.getSubjectByHeader(header);
+        service.updateInfo(shortcode, token,url.addOwner(),url.removeOwner(), url.url());
+        
+        URLStatsResponseDTO dto = service.getAllStats(shortcode, token);
+        return ResponseEntity.ok(dto); 
     }
 }

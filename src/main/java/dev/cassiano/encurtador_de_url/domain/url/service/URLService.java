@@ -1,5 +1,6 @@
 package dev.cassiano.encurtador_de_url.domain.url.service;
 
+import java.util.ArrayList;
 import java.util.UUID;
 import java.time.OffsetDateTime;
 
@@ -9,6 +10,7 @@ import org.springframework.stereotype.Service;
 import dev.cassiano.encurtador_de_url.domain.error.exceptions.ForbitenException;
 import dev.cassiano.encurtador_de_url.domain.error.exceptions.NotFoundException;
 import dev.cassiano.encurtador_de_url.domain.url.dtos.URLResponseDTO;
+import dev.cassiano.encurtador_de_url.domain.url.dtos.URLStatsResponseDTO;
 import dev.cassiano.encurtador_de_url.domain.url.entity.URL;
 import dev.cassiano.encurtador_de_url.domain.url.repository.URLRepository;
 
@@ -17,6 +19,11 @@ public class URLService {
 
     @Autowired
     private URLRepository repository;
+    private void validateOwners(URL url, String subject) {
+        if (!url.getOwners().contains(subject)) {        
+            throw new ForbitenException("Don't have authorization to do this");
+        }
+    }
 
     public URL redirectToUrl(String shortcode) throws NotFoundException {
         URL url = this.findByShortcode(shortcode);
@@ -27,13 +34,13 @@ public class URLService {
 
     public URLResponseDTO returnOriginalUrl(String shortcode, String subject) throws NotFoundException {
         URL url = this.findByShortcode(shortcode);
-        if (url.getOwners().contains(subject)) {
-            return new URLResponseDTO(url);
-        }
-        throw new ForbitenException("Don't have authorization to do this");
+        this.validateOwners(url, subject);
+        
+        return new URLResponseDTO(url);
     }
     
     private URL findByShortcode(String shortcode) throws NotFoundException {
+        
         return repository.findByShortcode(shortcode).orElseThrow(() -> new NotFoundException("This shortcode do not exists"));
     }
 
@@ -60,11 +67,46 @@ public class URLService {
     
     public void deleteShortenUrl(String shortcode, String subject) throws NotFoundException {
         URL url = repository.findByShortcode(shortcode).orElseThrow(() -> new NotFoundException("This shortcode do not exists"));
-        if (url.getOwners().contains(subject)) {
-            repository.delete(url);
-        } else {
-            throw new ForbitenException("Don't have authorization to do this");
+        this.validateOwners(url, subject);
+        repository.delete(url);
+    }
+
+    public URLStatsResponseDTO getAllStats(String shortcode, String subject) throws NotFoundException {
+        URL url = repository.findByShortcode(shortcode).orElseThrow(() -> new NotFoundException("This shortcode is invalid"));
+        this.validateOwners(url, subject);
+        return new URLStatsResponseDTO(url);
+    }
+
+    public void updateInfo(String shortcode, String subject, String[] addOwner, String[] removeOwner, String newUrl) throws NotFoundException {
+        URL url = this.findByShortcode(shortcode);
+        ArrayList<String> urlOwners = url.getOwners();
+        this.validateOwners(url, subject);
+
+        if (removeOwner == null && addOwner == null && newUrl == null) {
+            throw new NullPointerException("The required information is null or invalid");
+        }
+
+        if (addOwner != null ) {
+            for (String owner : addOwner) {
+                if (!urlOwners.contains(owner)) {
+                    urlOwners.add(owner);
+                }
+            }
+        }
+
+        if (removeOwner != null ) {
+            for (String owner : removeOwner) {
+                if (!owner.equals(urlOwners.get(0))) {
+                    urlOwners.remove(owner);
+                }
+            }
+        }
+
+        if (newUrl != null) {
+            url.setUrl(newUrl);
         }
         
+        url.setOwners(urlOwners);
+        repository.save(url);
     }
 }

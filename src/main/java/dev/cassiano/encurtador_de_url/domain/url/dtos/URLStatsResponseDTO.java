@@ -8,9 +8,17 @@ public record URLStatsResponseDTO(
     String create_data,
     String url,
     String shortcode,
-    int acesscount)  {
+    int acesscount,
+    String[] owners)  {
 
     public URLStatsResponseDTO(URL url) {
-        this(url.getId(), url.getUpdate_date(), url.getCreate_data(), url.getUrl(), url.getShortcode(), url.getAcesscount());
+        this(url.getId(), 
+             url.getUpdate_date(), 
+             url.getCreate_data(), 
+             url.getUrl(), 
+             url.getShortcode(), 
+             url.getAcesscount(), 
+             url.getOwners().toArray(new String[url.getOwners().size()])
+            );
     }
 }
