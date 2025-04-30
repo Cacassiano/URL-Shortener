@@ -6,7 +6,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.view.RedirectView;
 
@@ -31,11 +31,11 @@ public class URLController {
     }
 
     @PostMapping(value = "/shorten")
-    public ResponseEntity<URLResponseDTO> shortenURL(@RequestParam("url") String url){
-        if (url == null || url.length() <= 1) {
+    public ResponseEntity<URLResponseDTO> shortenURL(@RequestBody URLRequestDTO url){
+        if (url.url() == null || url.url().length() <= 1) {
             throw new NullPointerException("Required information 'url' is missing");
         }
-        URL newUrl = service.createNewUrl(url);
+        URL newUrl = service.createNewUrl(url.url());
         return ResponseEntity
                 .status(HttpStatusCode.valueOf(201))
                 .body(new URLResponseDTO(newUrl));
