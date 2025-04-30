@@ -32,6 +32,7 @@ public class SecurityConfig {
             .authorizeHttpRequests(req -> req
                 .requestMatchers(HttpMethod.POST ,"/api/v1/auth/register" ).permitAll()    
                 .requestMatchers(HttpMethod.POST ,"/api/v1/auth/login" ).permitAll()
+                .requestMatchers(HttpMethod.GET, "/{shortcode}").permitAll()
                 .anyRequest().authenticated()
             )
             .addFilterBefore(securityFilter, UsernamePasswordAuthenticationFilter.class);

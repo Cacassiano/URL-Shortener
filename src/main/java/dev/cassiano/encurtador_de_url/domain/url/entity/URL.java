@@ -1,5 +1,7 @@
 package dev.cassiano.encurtador_de_url.domain.url.entity;
 
+import java.util.ArrayList;
+
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -34,4 +36,13 @@ public class URL {
     @Column(nullable = false)
     int acesscount;
 
+    @Column(nullable = false)
+    ArrayList<String> owners;
+
+    public ArrayList<String> getOwners() {
+        if (owners == null) {
+            this.owners = new ArrayList<>();
+        }
+        return owners;
+    }
 }
