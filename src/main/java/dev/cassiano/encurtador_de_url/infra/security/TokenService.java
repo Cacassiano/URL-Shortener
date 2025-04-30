@@ -7,34 +7,34 @@ import org.springframework.stereotype.Service;
 
 import com.auth0.jwt.JWT;
 import com.auth0.jwt.algorithms.Algorithm;
-import com.auth0.jwt.exceptions.JWTCreationException;
 import com.auth0.jwt.exceptions.JWTVerificationException;
+
 
 @Service
 public class TokenService {
     
-    @Value("${spring.application.secret_key}")
+    @Value("${secret_key}")
     private String secretKey;
 
     @Value("${spring.application.name}")
     private String appName;
 
-    private Algorithm algorithm = Algorithm.HMAC256(secretKey);
-
-    public String generateToken(String email) {
+    public String generateToken(String email) {   
         try {
+            Algorithm algorithm = Algorithm.HMAC256(secretKey);
             return JWT.create()
                     .withSubject(email)
                     .withIssuer(appName)
                     .withExpiresAt(OffsetDateTime.now().plusHours(2).toInstant())
-                    .sign(this.algorithm);
-        } catch (JWTCreationException e) {
+                    .sign(algorithm);
+        } catch (Exception e) {
             throw new RuntimeException(e.getMessage());
         }   
     }
 
     public String getSubject(String token) {
         try {
+            Algorithm algorithm = Algorithm.HMAC256(secretKey);
             return JWT.require(algorithm)
                     .withIssuer(appName)
                     .build()
