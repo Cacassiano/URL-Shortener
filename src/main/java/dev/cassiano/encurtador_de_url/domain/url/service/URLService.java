@@ -55,8 +55,8 @@ public class URLService {
         URL myUrl = new URL();
         
         myUrl.setAcesscount(0);
-        myUrl.setCreate_data(""+OffsetDateTime.now());
-        myUrl.setUpdate_date(myUrl.getCreate_data());
+        myUrl.setCreate_date(OffsetDateTime.now().toString());
+        myUrl.setUpdate_date(myUrl.getCreate_date());
         myUrl.setUrl(url);
         myUrl.setShortcode(shortcode); 
         myUrl.getOwners().add(owner);
@@ -107,6 +107,7 @@ public class URLService {
         }
         
         url.setOwners(urlOwners);
+        url.setUpdate_date(OffsetDateTime.now().toString());
         repository.save(url);
     }
 }

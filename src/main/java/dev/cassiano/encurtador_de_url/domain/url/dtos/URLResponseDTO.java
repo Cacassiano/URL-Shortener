@@ -10,6 +10,11 @@ public record URLResponseDTO(
     String shortcode) {
     
     public URLResponseDTO(URL url) {
-        this(url.getId(), url.getUpdate_date(), url.getCreate_data(), url.getUrl(), url.getShortcode());
+        this(url.getId(), 
+             url.getUpdate_date(), 
+             url.getCreate_date(), 
+             url.getUrl(), 
+             url.getShortcode()
+            );
     }
 }

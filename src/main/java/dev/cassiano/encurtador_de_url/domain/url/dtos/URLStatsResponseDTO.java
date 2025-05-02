@@ -14,7 +14,7 @@ public record URLStatsResponseDTO(
     public URLStatsResponseDTO(URL url) {
         this(url.getId(), 
              url.getUpdate_date(), 
-             url.getCreate_data(), 
+             url.getCreate_date(), 
              url.getUrl(), 
              url.getShortcode(), 
              url.getAcesscount(), 

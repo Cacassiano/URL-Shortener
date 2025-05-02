@@ -25,7 +25,7 @@ public class URL {
     String update_date;
     
     @Column(nullable = false)
-    String create_data;
+    String create_date;
     
     @Column(nullable = false)
     String url;
