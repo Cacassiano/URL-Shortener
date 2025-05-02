@@ -6,6 +6,7 @@ public record URLStatsResponseDTO(
     String id,
     String update_date,
     String create_data,
+    String expires_at,
     String url,
     String shortcode,
     int acesscount,
@@ -13,8 +14,9 @@ public record URLStatsResponseDTO(
 
     public URLStatsResponseDTO(URL url) {
         this(url.getId(), 
-             url.getUpdate_date(), 
-             url.getCreate_date(), 
+             url.getUpdate_date().toString(), 
+             url.getCreate_date().toString(), 
+             url.getExpiresAt().toString(),
              url.getUrl(), 
              url.getShortcode(), 
              url.getAcesscount(), 

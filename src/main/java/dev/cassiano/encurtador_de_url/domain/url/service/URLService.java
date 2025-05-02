@@ -17,9 +17,12 @@ import dev.cassiano.encurtador_de_url.domain.url.repository.URLRepository;
 @Service
 public class URLService {
 
+    private final long EXPIRATION_TIME_HOURS = 12;
+
     @Autowired
     private URLRepository repository;
-    private void validateOwners(URL url, String subject) {
+
+    private void validateOwners(URL url, String subject) throws ForbitenException {
         if (!url.getOwners().contains(subject)) {        
             throw new ForbitenException("Don't have authorization to do this");
         }
@@ -28,11 +31,14 @@ public class URLService {
     public URL redirectToUrl(String shortcode) throws NotFoundException {
         URL url = this.findByShortcode(shortcode);
         url.setAcesscount(url.getAcesscount()+1);
+        if (url.getExpiresAt().isBefore(OffsetDateTime.now())) {
+            throw new NotFoundException("The link has expires at all");
+        }
         repository.save(url);
         return url;
     }
 
-    public URLResponseDTO returnOriginalUrl(String shortcode, String subject) throws NotFoundException {
+    public URLResponseDTO returnOriginalUrl(String shortcode, String subject) throws NotFoundException, ForbitenException {
         URL url = this.findByShortcode(shortcode);
         this.validateOwners(url, subject);
         
@@ -55,8 +61,9 @@ public class URLService {
         URL myUrl = new URL();
         
         myUrl.setAcesscount(0);
-        myUrl.setCreate_date(OffsetDateTime.now().toString());
+        myUrl.setCreate_date(OffsetDateTime.now());
         myUrl.setUpdate_date(myUrl.getCreate_date());
+        myUrl.setExpiresAt(myUrl.getCreate_date().plusHours(EXPIRATION_TIME_HOURS));
         myUrl.setUrl(url);
         myUrl.setShortcode(shortcode); 
         myUrl.getOwners().add(owner);
@@ -65,19 +72,19 @@ public class URLService {
         return myUrl;
     }
     
-    public void deleteShortenUrl(String shortcode, String subject) throws NotFoundException {
+    public void deleteShortenUrl(String shortcode, String subject) throws NotFoundException, ForbitenException {
         URL url = repository.findByShortcode(shortcode).orElseThrow(() -> new NotFoundException("This shortcode do not exists"));
         this.validateOwners(url, subject);
         repository.delete(url);
     }
 
-    public URLStatsResponseDTO getAllStats(String shortcode, String subject) throws NotFoundException {
+    public URLStatsResponseDTO getAllStats(String shortcode, String subject) throws NotFoundException, ForbitenException {
         URL url = repository.findByShortcode(shortcode).orElseThrow(() -> new NotFoundException("This shortcode is invalid"));
         this.validateOwners(url, subject);
         return new URLStatsResponseDTO(url);
     }
 
-    public void updateInfo(String shortcode, String subject, String[] addOwner, String[] removeOwner, String newUrl) throws NotFoundException {
+    public void updateInfo(String shortcode, String subject, String[] addOwner, String[] removeOwner, String newUrl) throws NotFoundException, ForbitenException {
         URL url = this.findByShortcode(shortcode);
         ArrayList<String> urlOwners = url.getOwners();
         this.validateOwners(url, subject);
@@ -107,7 +114,7 @@ public class URLService {
         }
         
         url.setOwners(urlOwners);
-        url.setUpdate_date(OffsetDateTime.now().toString());
+        url.setUpdate_date(OffsetDateTime.now());
         repository.save(url);
     }
 }
