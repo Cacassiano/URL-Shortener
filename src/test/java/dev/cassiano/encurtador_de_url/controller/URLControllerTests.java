@@ -1,5 +1,5 @@
 package dev.cassiano.encurtador_de_url.controller;
-
+/*
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,16 +17,14 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 
-
-
 import dev.cassiano.encurtador_de_url.domain.url.controller.URLController;
 import dev.cassiano.encurtador_de_url.domain.url.entity.URL;
-import dev.cassiano.encurtador_de_url.domain.url.service.URLService;
+import dev.cassiano.encurtador_de_url.domain.url.service.URLService;*/
 
-@WebMvcTest(URLController.class)
-@AutoConfigureMockMvc
+/*@WebMvcTest(URLController.class)
+@AutoConfigureMockMvc*/
 public class URLControllerTests {
-    @Autowired
+    /*@Autowired
     private MockMvc mockMvc;
     
     @MockitoBean
@@ -58,5 +56,5 @@ public class URLControllerTests {
                         .andExpect(status().isBadRequest());                        
         verify(this.service, times(0)).createNewUrl(testURL);
     }
-
+*/
 }

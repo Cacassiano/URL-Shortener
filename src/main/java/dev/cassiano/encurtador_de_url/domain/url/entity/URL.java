@@ -1,5 +1,8 @@
 package dev.cassiano.encurtador_de_url.domain.url.entity;
 
+import java.time.OffsetDateTime;
+import java.util.ArrayList;
+
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -20,11 +23,14 @@ public class URL {
     String id;
 
     @Column(nullable = false)
-    String update_date;
+    OffsetDateTime update_date;
     
     @Column(nullable = false)
-    String create_data;
+    OffsetDateTime create_date;
     
+    @Column(nullable = false)
+    OffsetDateTime expiresAt;
+
     @Column(nullable = false)
     String url;
     
@@ -34,4 +40,13 @@ public class URL {
     @Column(nullable = false)
     int acesscount;
 
+    @Column(nullable = false)
+    ArrayList<String> owners;
+
+    public ArrayList<String> getOwners() {
+        if (owners == null) {
+            this.owners = new ArrayList<>();
+        }
+        return owners;
+    }
 }

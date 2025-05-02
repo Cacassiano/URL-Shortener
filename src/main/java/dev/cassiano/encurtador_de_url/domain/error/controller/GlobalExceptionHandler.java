@@ -7,14 +7,18 @@ import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
 
+import dev.cassiano.encurtador_de_url.domain.error.exceptions.ForbitenException;
+
+
 @ControllerAdvice
 public class GlobalExceptionHandler extends ResponseEntityExceptionHandler{
-    @ExceptionHandler(NullPointerException.class)
-    public ResponseEntity<String> NullPointerExceptionHandler(NullPointerException exception) {
+
+    @ExceptionHandler(ForbitenException.class)
+    public ResponseEntity<String> ForbitenExceptionHandler(NotFoundException exception) {
         return ResponseEntity
-                .badRequest()
-                .body(exception.getMessage());
-    }   
+                .status(HttpStatus.FORBIDDEN)
+                .body(exception.getMessage());        
+    }
 
     @ExceptionHandler(NotFoundException.class)
     public ResponseEntity<String> NotFoundExceptionHandler(NotFoundException exception) {
@@ -22,4 +26,20 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler{
                 .status(HttpStatus.NOT_FOUND)
                 .body(exception.getMessage());        
     }
+
+    @ExceptionHandler(NullPointerException.class)
+    public ResponseEntity<String> NullPointerExceptionHandler(NullPointerException exception) {
+        return ResponseEntity
+                .badRequest()
+                .body(exception.getMessage());
+    }   
+
+    @ExceptionHandler(RuntimeException.class)
+    public ResponseEntity<String> RuntimeExceptionHandler(RuntimeException e) {
+        return ResponseEntity
+                .internalServerError()
+                .body(e.getMessage());
+    }
+
+    
 }
